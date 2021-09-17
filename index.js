@@ -12,6 +12,10 @@ const discordCommandCenter = new CommandCenter();
 require('./bot/commands/console-commands/console-commands')(consoleCommandCenter); 
 require('./bot/commands/discord-commands/discord-commands')(discordCommandCenter);
 
+const MusicBotManager = require('./bot/music/music-bot-manager');
+
+global.musicBotManager = new MusicBotManager();
+
 const readline = require('readline').createInterface(
 {
     input: process.stdin,

@@ -1,4 +1,5 @@
 const CustomCommand = require('../custom-command');
+const DiscordUtils = require('../../discord-utils');
 
 module.exports = class Announce extends CustomCommand
 {
@@ -7,7 +8,7 @@ module.exports = class Announce extends CustomCommand
         super('announce', 'Announces something to every server.');
     }
 
-    action(client, split)
+    action(client, split, cmd, command)
     {
         if (split.length > 1)
         {
@@ -20,7 +21,7 @@ module.exports = class Announce extends CustomCommand
                 
                 c.forEach(channel =>
                 {
-                    send('@everyone >> ' + cmd.substring(command.length), channel);
+                    DiscordUtils.send('@everyone >> ' + cmd.substring(command.length), channel);
                 });
             });
         }

@@ -8,6 +8,9 @@ const Help = require('./help');
 const NotProud = require('./not-proud');
 const Proud = require('./proud');
 const Weather = require('./weather');
+const Play = require('./play');
+const Skip = require('./skip');
+const Stop = require('./stop');
 
 module.exports = function addAllCommands(cmdCenter)
 {
@@ -18,6 +21,9 @@ module.exports = function addAllCommands(cmdCenter)
     cmdCenter.addCommand(new NotProud());
     cmdCenter.addCommand(new Proud());
     cmdCenter.addCommand(new Weather());
+    cmdCenter.addCommand(new Play());
+    cmdCenter.addCommand(new Skip());
+    cmdCenter.addCommand(new Stop());
 
     addSimpleCommands(cmdCenter);
 }

@@ -22,7 +22,7 @@ module.exports = class VCPlayer
         let song = this.songs[0];
         for(let i = 1; i < this.songs.length; i++)
         {
-            songs[i - 1] = songs[i];
+            this.songs[i - 1] = this.songs[i];
         }
         this.songs.length--;
 
@@ -50,9 +50,15 @@ module.exports = class VCPlayer
     skip()
     {
         if(this.songs.length == 0)
+        {
             this.stop();
+            return true;
+        }
         else
+        {
             this.playNext();
+            return false;
+        }
     }
 
     stop()

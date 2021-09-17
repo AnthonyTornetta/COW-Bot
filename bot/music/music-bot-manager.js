@@ -10,26 +10,26 @@ module.exports = class MusicBotManager
 {
     constructor()
     {
-        this.vcPlayers = [];
+        this.vcPlayers = {};
     }
 
     addSong(vc, txtChannel, song)
     {
-        if(!this.vcPlayers[vc.guildId])
+        if(!this.vcPlayers[vc.guild.id])
         {
-            this.vcPlayers[vc.guildId] = new VCPlayer(vc, txtChannel);
+            this.vcPlayers[vc.guild.id] = new VCPlayer(vc, txtChannel);
         }
 
         DiscordUtils.send('Adding: ' + song.format(), txtChannel);
         
-        this.vcPlayers[vc.guildId].txtChannel = txtChannel; // keeps it updated
+        this.vcPlayers[vc.guild.id].txtChannel = txtChannel; // keeps it updated
 
-        this.vcPlayers[vc.guildId].addSong(song);
+        this.vcPlayers[vc.guild.id].addSong(song);
         
         let listStr = `Upcoming Songs\n\`\`\`css\n`;
-        for(let i = 0; i < this.vcPlayers[vc.guildId].songs.length; i++)
+        for(let i = 0; i < this.vcPlayers[vc.guild.id].songs.length; i++)
         {
-            let song = this.vcPlayers[vc.guildId].songs[i];
+            let song = this.vcPlayers[vc.guild.id].songs[i];
             
             listStr += `${i + 1}: ${format(song.name, song.author, song.duration)}\n`;
         }
@@ -37,28 +37,35 @@ module.exports = class MusicBotManager
 
         DiscordUtils.send(listStr, txtChannel);
 
-        if(!this.vcPlayers[vc.guildId].playing)
-            this.vcPlayers[vc.guildId].start();
+        if(!this.vcPlayers[vc.guild.id].playing)
+            this.vcPlayers[vc.guild.id].start();
     }
 
     skip(txtChannel)
     {
-        if(this.vcPlayers[txtChannel.guildId])
+        if(this.vcPlayers[txtChannel.guild.id])
         {
-            DiscordUtils.send(':fast_forward:', txtChannel);
-            this.vcPlayers[txtChannel.guildId].skip();
+            if(this.vcPlayers[txtChannel.guild.id].skip())
+            {
+                DiscordUtils.send(':wave:', txtChannel);
+                this.vcPlayers[txtChannel.guild.id] = undefined;
+            }
+            else
+            {
+                DiscordUtils.send(':fast_forward:', txtChannel);
+            }
             return true;
         }
         return false;
     }
-    
+
     stop(txtChannel)
     {
-        if(this.vcPlayers[txtChannel.guildId])
+        if(this.vcPlayers[txtChannel.guild.id])
         {
             DiscordUtils.send(':wave:', txtChannel);
-            this.vcPlayers[txtChannel.guildId].stop();
-            this.vcPlayers[txtChannel.guildId] = null;
+            this.vcPlayers[txtChannel.guild.id].stop();
+            this.vcPlayers[txtChannel.guild.id] = null;
             return true;
         }
         return false;

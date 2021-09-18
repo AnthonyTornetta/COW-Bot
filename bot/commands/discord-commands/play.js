@@ -36,7 +36,7 @@ module.exports = class Play extends CustomCommand
 
         if(isURL)
         {
-            ytProxy.videoInfo(split[1], (res) =>
+            ytProxy.videoInfo(ytProxy.idFromURL(split[1]), (res) =>
             {
                 handleURL(vc, msg, res);
             });

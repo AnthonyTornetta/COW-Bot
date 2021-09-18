@@ -26,6 +26,11 @@ module.exports = {
         ytdl(url).pipe(fs.createWriteStream(saveAs));
     },
 
+    idFromURL: (url) =>
+    {
+        return url.match(/(?:https?:\/\/)?(?:www\.|m\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\/?\?v=|\/embed\/|\/)([^\s&\?\/\#]+)/)[1];
+    },
+
     videoInfo: (id, callback) =>
     {
         ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${id}`).then(res =>

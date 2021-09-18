@@ -17,7 +17,10 @@ module.exports = class VCPlayer
     playNext()
     {
         if(this.songs.length === 0)
+        {
+            global.musicBotManager.stop(this.txtChannel);
             return;
+        }
 
         let song = this.songs[0];
         for(let i = 1; i < this.songs.length; i++)

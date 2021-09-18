@@ -3,9 +3,14 @@ const ytProxy = require('../../../bot/music/youtube-proxy');
 const CustomCommand = require('../custom-command');
 const DiscordUtils = require('../../discord-utils');
 
-const YT_URL = 'https://www.youtube.com/';
-
 const Song = require('../../music/song');
+
+// https://stackoverflow.com/questions/28735459/how-to-validate-youtube-url-in-client-side-in-text-box
+function isYTUrl(url)
+{
+    const p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(\?\S*)?$/;
+    return url.match(p) && url.match(p)[1];
+}
 
 module.exports = class Play extends CustomCommand
 {
@@ -30,11 +35,8 @@ module.exports = class Play extends CustomCommand
             DiscordUtils.send('Usage: ?play [url/youtube search]', msg.channel);
             return;
         }
-        
-        let isURL = split.length === 2 && 
-            split[1].substr(0, YT_URL.length).toLowerCase() === YT_URL;
 
-        if(isURL)
+        if(isYTUrl(split[1]))
         {
             ytProxy.videoInfo(ytProxy.idFromURL(split[1]), (res) =>
             {

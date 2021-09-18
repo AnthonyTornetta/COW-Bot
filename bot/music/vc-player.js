@@ -12,6 +12,8 @@ module.exports = class VCPlayer
         this.dispatcher = null;
         this.txtChannel = txtChannel;
         this.playing = false;
+
+        this.timeout = null;
     }
 
     playNext()
@@ -21,7 +23,7 @@ module.exports = class VCPlayer
             global.musicBotManager.stop(this.txtChannel);
             return;
         }
-
+        
         let song = this.songs[0];
         for(let i = 1; i < this.songs.length; i++)
         {
@@ -34,10 +36,11 @@ module.exports = class VCPlayer
             DiscordUtils.send(`:arrow_forward: ${song.format()}`, this.txtChannel);
 
             this.dispatcher = con.playStream(ytdl(song.url));
-            this.dispatcher.on("finish", end =>
+
+            this.timeout = setTimeout(() =>
             {
                 this.playNext();
-            });
+            }, song.duration * 1000);
         }).catch(e =>
         {
             console.error(e);
@@ -52,6 +55,12 @@ module.exports = class VCPlayer
 
     skip()
     {
+        if(this.timeout !== null)
+        {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+        }
+
         if(this.songs.length == 0)
         {
             this.stop();
@@ -66,6 +75,12 @@ module.exports = class VCPlayer
 
     stop()
     {
+        if(this.timeout !== null)
+        {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+        }
+
         this.vc.leave();
         this.songs = [];
     }

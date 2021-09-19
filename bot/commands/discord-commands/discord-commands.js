@@ -11,6 +11,7 @@ const Weather = require('./weather');
 const Play = require('./play');
 const Skip = require('./skip');
 const Stop = require('./stop');
+const Autoplay = require('./autoplay');
 
 module.exports = function addAllCommands(cmdCenter)
 {
@@ -24,6 +25,7 @@ module.exports = function addAllCommands(cmdCenter)
     cmdCenter.addCommand(new Play());
     cmdCenter.addCommand(new Skip());
     cmdCenter.addCommand(new Stop());
+    cmdCenter.addCommand(new Autoplay());
 
     addSimpleCommands(cmdCenter);
 }

@@ -1,6 +1,7 @@
 const Song = require('./song');
 const DiscordUtils = require('../discord-utils');
 const ytdl = require('ytdl-core');
+const ytProxy = require('./youtube-proxy');
 
 module.exports = class VCPlayer
 {
@@ -11,7 +12,8 @@ module.exports = class VCPlayer
         this.vc = vc;
         this.dispatcher = null;
         this.txtChannel = txtChannel;
-        this.playing = false;
+        this.playing = null;
+        this.autoplay = false;
 
         this.timeout = null;
     }
@@ -20,8 +22,16 @@ module.exports = class VCPlayer
     {
         if(this.songs.length === 0)
         {
-            global.musicBotManager.stop(this.txtChannel);
-            return;
+            if(this.shouldAutoplay())
+            {
+                this.playAutoplay();
+                return;
+            }
+            else
+            {
+                global.musicBotManager.stop(this.txtChannel);
+                return;
+            }
         }
         
         let song = this.songs[0];
@@ -34,12 +44,15 @@ module.exports = class VCPlayer
         this.vc.join().then(con =>
         {
             DiscordUtils.send(`:arrow_forward: ${song.format()}`, this.txtChannel);
-
+            
+            this.playing = song;
             this.dispatcher = con.playStream(ytdl(song.url));
 
             this.timeout = setTimeout(() =>
             {
                 this.playNext();
+
+                this.playing = null;
             }, song.duration * 1000);
         }).catch(e =>
         {
@@ -50,7 +63,27 @@ module.exports = class VCPlayer
     start()
     {
         this.playNext();
-        this.playing = true;
+    }
+
+    shouldAutoplay()
+    {
+        return this.autoplay && this.playing && this.vc.members.size > 1;
+    }
+
+    playAutoplay()
+    {
+        ytProxy.relatedVideos(this.playing.url, (res) =>
+        {
+            let selected = res[~~(Math.random() * res.length)];
+
+            ytProxy.videoInfo(`https://www.youtube.com/watch?v=${selected.id}`, (res) =>
+            {
+                this.addSong(new Song(
+                    res.videoDetails.title, res.videoDetails.author.name, res.videoDetails.lengthSeconds, res.videoDetails.video_url));
+
+                this.playNext();
+            });
+        });
     }
 
     skip()
@@ -63,8 +96,16 @@ module.exports = class VCPlayer
 
         if(this.songs.length == 0)
         {
-            this.stop();
-            return true;
+            if(this.shouldAutoplay())
+            {
+                this.playAutoplay();
+                return false;
+            }
+            else
+            {
+                this.stop();
+                return true;
+            }
         }
         else
         {
@@ -81,6 +122,8 @@ module.exports = class VCPlayer
             this.timeout = null;
         }
 
+        this.playing = null;
+        this.dispatcher = null;
         this.vc.leave();
         this.songs = [];
     }

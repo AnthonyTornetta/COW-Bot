@@ -5,7 +5,7 @@ module.exports = class Skip extends CustomCommand
 {
     constructor()
     {
-        super(['skip', 's'], 'COW bot skips the current song.');
+        super(['autoplay', 'a', 'ap'], 'COW bot autoplays the next song song based on the wind current.');
     }
 
     action(msg)
@@ -16,20 +16,18 @@ module.exports = class Skip extends CustomCommand
             return;
         }
 
-        global.musicBotManager.skip(msg.channel, (err, res) =>
+        global.musicBotManager.autoplay(msg.channel, (err, res) =>
         {
             if(err)
+            {
                 DiscordUtils.send(err, msg.channel);
+            }
             else
             {
-                if(res === 'leave')
-                {
-                    DiscordUtils.send(':wave:', msg.channel);
-                }
-                else if(res === 'skip')
-                {
-                    DiscordUtils.send(':fast_forward:', msg.channel);
-                }
+                if(res)
+                    DiscordUtils.send('Autoplay Enabled :fire::fire::fire:', msg.channel);
+                else
+                    DiscordUtils.send('Autoplay Disabled :ice_cube::ice_cube::ice_cube:', msg.channel);
             }
         });
     }

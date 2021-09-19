@@ -31,11 +31,19 @@ module.exports = {
         return url.match(/(?:https?:\/\/)?(?:www\.|m\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\/?\?v=|\/embed\/|\/)([^\s&\?\/\#]+)/)[1];
     },
 
-    videoInfo: (id, callback) =>
+    videoInfo: (url, callback) =>
     {
-        ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${id}`).then(res =>
+        ytdl.getBasicInfo(url).then(res =>
         {
             callback(res);
+        });
+    },
+
+    relatedVideos: (url, callback) =>
+    {
+        ytdl.getBasicInfo(url).then(res =>
+        {
+            callback(res.related_videos);
         });
     }
 }

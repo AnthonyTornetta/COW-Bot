@@ -16,6 +16,13 @@ module.exports = class Stop extends CustomCommand
             return;
         }
 
-        global.musicBotManager.stop(msg.channel);
+        if(global.musicBotManager.stop(msg.channel))
+        {
+            DiscordUtils.send(':wave:', msg.channel);
+        }
+        else
+        {
+            DiscordUtils.send('I\'m not in a voice call.', msg.channel);
+        }
     }
 };

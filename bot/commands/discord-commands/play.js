@@ -8,7 +8,7 @@ const Song = require('../../music/song');
 // https://stackoverflow.com/questions/28735459/how-to-validate-youtube-url-in-client-side-in-text-box
 function isYTUrl(url)
 {
-    const p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(\?\S*)?$/;
+    const p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
     return url.match(p) && url.match(p)[1];
 }
 
@@ -38,7 +38,7 @@ module.exports = class Play extends CustomCommand
 
         if(isYTUrl(split[1]))
         {
-            ytProxy.videoInfo(ytProxy.idFromURL(split[1]), (res) =>
+            ytProxy.videoInfo(split[1], (res) =>
             {
                 handleURL(vc, msg, res);
             });
@@ -53,7 +53,7 @@ module.exports = class Play extends CustomCommand
                     DiscordUtils.send('Unable to find a video matching that name :(', msg.channel);
                 else
                 {
-                    ytProxy.videoInfo(res.id, (res) =>
+                    ytProxy.videoInfo(res.link, (res) =>
                     {
                         handleURL(vc, msg, res);
                     });

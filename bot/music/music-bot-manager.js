@@ -41,33 +41,48 @@ module.exports = class MusicBotManager
             this.vcPlayers[vc.guild.id].start();
     }
 
-    skip(txtChannel)
+    skip(txtChannel, callback)
     {
         if(this.vcPlayers[txtChannel.guild.id])
         {
             if(this.vcPlayers[txtChannel.guild.id].skip())
             {
-                DiscordUtils.send(':wave:', txtChannel);
                 this.vcPlayers[txtChannel.guild.id] = undefined;
+
+                if(callback)
+                    callback(undefined, 'leave');
             }
             else
             {
-                DiscordUtils.send(':fast_forward:', txtChannel);
+                if(callback)
+                    callback(undefined, 'skip');
             }
-            return true;
         }
-        return false;
+        else
+            callback('I\'m not in a voice channel.');
     }
 
     stop(txtChannel)
     {
         if(this.vcPlayers[txtChannel.guild.id])
         {
-            DiscordUtils.send(':wave:', txtChannel);
             this.vcPlayers[txtChannel.guild.id].stop();
             this.vcPlayers[txtChannel.guild.id] = null;
             return true;
         }
         return false;
+    }
+
+    autoplay(txtChannel, callback)
+    {
+        if(this.vcPlayers[txtChannel.guild.id])
+        {
+            let bot = this.vcPlayers[txtChannel.guild.id];
+            bot.autoplay = !bot.autoplay;
+            
+            callback(undefined, bot.autoplay);
+        }
+        else if(callback)
+            callback('Bot not in a voice channel.');
     }
 }

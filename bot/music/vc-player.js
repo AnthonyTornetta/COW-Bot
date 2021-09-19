@@ -74,7 +74,7 @@ module.exports = class VCPlayer
     {
         ytProxy.relatedVideos(this.playing.url, (res) =>
         {
-            let selected = res[~~(Math.random() * res.length)];
+            let selected = res[~~(Math.random() * Math.min(3, res.length))];
 
             ytProxy.videoInfo(`https://www.youtube.com/watch?v=${selected.id}`, (res) =>
             {

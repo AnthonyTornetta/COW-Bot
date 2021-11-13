@@ -10,7 +10,7 @@ module.exports = class Proud extends CustomCommand
 
     action(msg)
     {
-        let mentioned = getMentioned(msg);
+        let mentioned = DiscordUtils.getMentioned(msg);
 
         if (mentioned.length === 0)
             DiscordUtils.send('COW bot is proud of @everyone.', msg.channel);

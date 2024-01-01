@@ -40,7 +40,7 @@ export default class VCPlayer {
 
     this.player = createAudioPlayer({
       behaviors: {
-        noSubscriber: NoSubscriberBehavior.Play,
+        noSubscriber: NoSubscriberBehavior.Pause,
         maxMissedFrames: 5,
       },
     });
@@ -55,25 +55,15 @@ export default class VCPlayer {
       });
 
     this.player.on("stateChange", (oldState, newState) => {
-      if (
-        oldState.status === AudioPlayerStatus.Idle &&
-        newState.status === AudioPlayerStatus.Playing
-      ) {
-        console.log("Playing audio output on audio player");
-      } else if (newState.status === AudioPlayerStatus.Idle) {
-        console.log("Playback has stopped. Attempting to restart.");
-
-        console.log(this.player.unpause());
-
-        // if (this.playing) {
-        // this.playNext();
-        // }
+      if (newState.status === AudioPlayerStatus.Idle) {
+        if (this.playing) {
+          this.playNext();
+        }
       }
     });
   }
 
-  playNext() {
-    console.log(this.songs);
+  async playNext() {
     if (this.songs.length === 0) {
       if (this.shouldAutoplay()) {
         this.playAutoplay();
@@ -87,14 +77,16 @@ export default class VCPlayer {
     const song = this.songs.splice(0, 1)[0];
 
     this.playing = song;
-    const resource = createAudioResource(ytdl(song.url));
+    const resource = createAudioResource(
+      ytdl(song.url, {
+        filter: "audioonly",
+      })
+    );
 
     this.player.play(resource);
-
-    console.log(resource);
+    this.resource = resource;
 
     DiscordUtils.send(`:arrow_forward: ${song.format()}`, this.txtChannel);
-    // con.playStream();
   }
 
   start() {

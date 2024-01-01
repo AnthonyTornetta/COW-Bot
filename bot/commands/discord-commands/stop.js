@@ -7,7 +7,8 @@ export default class Stop extends CustomCommand {
   }
 
   action(msg) {
-    if (!msg.member.voiceChannelID) {
+    const vc = msg.member.voice.channel;
+    if (!vc) {
       DiscordUtils.send(
         "Must be in the voice channel to use this command!",
         msg.channel

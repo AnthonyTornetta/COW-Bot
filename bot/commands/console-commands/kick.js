@@ -10,7 +10,7 @@ export default class Kick extends CustomCommand {
       let memberFound = false;
 
       client.guilds.forEach((g) => {
-        g.fetchMembers(); //.then(guild =>
+        g.fetchMembers();
 
         g.members.forEach((m) => {
           console.log(m.user.tag);

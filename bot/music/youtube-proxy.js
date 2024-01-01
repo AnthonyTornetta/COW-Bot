@@ -1,49 +1,41 @@
-const fs = require('fs');
-const ytdl = require('ytdl-core');
-const auth = require('../../auth.json');
-const ytSearch = require('youtube-search');
+import fs from "fs";
+import ytdl from "ytdl-core";
+import auth from "../../auth.json" with { type: "json" };
+import ytSearch from "youtube-search";
 
-module.exports = {
-    search: (query, callback) =>
-    {
-        ytSearch(query, {maxResults: 4, key: auth.youtube }, ((err, res) =>
-        {
-            for(let i = 0; i < res.length; i++)
-            {
-                if(res[i].kind === 'youtube#video')
-                {
-                    callback(err, res[i]);
-                    return;
-                }
-            }
-            
-            callback(err, null);
-        }));
-    },
+export default {
+  search: (query, callback) => {
+    ytSearch(query, { maxResults: 4, key: auth.youtube }, (err, res) => {
+      for (let i = 0; i < res.length; i++) {
+        if (res[i].kind === "youtube#video") {
+          callback(err, res[i]);
+          return;
+        }
+      }
 
-    downloadSong: (url, saveAs) =>
-    {
-        ytdl(url).pipe(fs.createWriteStream(saveAs));
-    },
+      callback(err, null);
+    });
+  },
 
-    idFromURL: (url) =>
-    {
-        return url.match(/(?:https?:\/\/)?(?:www\.|m\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\/?\?v=|\/embed\/|\/)([^\s&\?\/\#]+)/)[1];
-    },
+  downloadSong: (url, saveAs) => {
+    ytdl(url).pipe(fs.createWriteStream(saveAs));
+  },
 
-    videoInfo: (url, callback) =>
-    {
-        ytdl.getBasicInfo(url).then(res =>
-        {
-            callback(res);
-        });
-    },
+  idFromURL: (url) => {
+    return url.match(
+      /(?:https?:\/\/)?(?:www\.|m\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\/?\?v=|\/embed\/|\/)([^\s&\?\/\#]+)/
+    )[1];
+  },
 
-    relatedVideos: (url, callback) =>
-    {
-        ytdl.getBasicInfo(url).then(res =>
-        {
-            callback(res.related_videos);
-        });
-    }
-}
+  videoInfo: (url, callback) => {
+    ytdl.getBasicInfo(url).then((res) => {
+      callback(res);
+    });
+  },
+
+  relatedVideos: (url, callback) => {
+    ytdl.getBasicInfo(url).then((res) => {
+      callback(res.related_videos);
+    });
+  },
+};

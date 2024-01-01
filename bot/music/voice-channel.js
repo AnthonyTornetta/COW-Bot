@@ -1,7 +1,5 @@
-module.exports = class VoiceChannel
-{
-    constructor()
-    {
-        this.songs = [];
-    }
+export default class VoiceChannel {
+  constructor() {
+    this.songs = [];
+  }
 }

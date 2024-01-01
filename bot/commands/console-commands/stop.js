@@ -1,15 +1,12 @@
-const CustomCommand = require('../custom-command');
+import CustomCommand from "../custom-command.js";
 
-module.exports = class Stop extends CustomCommand
-{
-    constructor()
-    {
-        super('stop', 'Exits the bot.');
-    }
+export default class Stop extends CustomCommand {
+  constructor() {
+    super("stop", "Exits the bot.");
+  }
 
-    action(client)
-    {
-        client.destroy();
-        return false;
-    }
-};
+  action(client) {
+    client.destroy();
+    return false;
+  }
+}

@@ -1,15 +1,12 @@
-const CustomCommand = require('../custom-command');
-const DiscordUtils = require('../../discord-utils');
+import CustomCommand from "../custom-command.js";
+import DiscordUtils from "../../discord-utils.js";
 
-module.exports = class Coinflip extends CustomCommand
-{
-    constructor()
-    {
-        super(['coinflip', 'flipcoin'], 'COW bot flips a coin.');
-    }
+export default class Coinflip extends CustomCommand {
+  constructor() {
+    super(["coinflip", "flipcoin"], "COW bot flips a coin.");
+  }
 
-    action(msg)
-    {
-        DiscordUtils.send(Math.random() < .5 ? 'Heads' : 'Tails', msg.channel);
-    }
-};
+  action(msg) {
+    DiscordUtils.send(Math.random() < 0.5 ? "Heads" : "Tails", msg.channel);
+  }
+}

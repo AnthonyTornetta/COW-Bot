@@ -1,19 +1,16 @@
-const CustomCommand = require('../custom-command');
+import CustomCommand from "../custom-command.js";
 
-const auth = require('../../../auth.json');
+import auth from "../../../auth.json" with { type: "json" };
 
-module.exports = class Restart extends CustomCommand
-{
-    constructor()
-    {
-        super('restart', 'Logs out then logs back in.');
-    }
+export default class Restart extends CustomCommand {
+  constructor() {
+    super("restart", "Logs out then logs back in.");
+  }
 
-    action(client)
-    {
-        client.destroy();
-        client.login(auth.token);
-        console.log('Restarted!');
-        return true;
-    }
-};
+  action(client) {
+    client.destroy();
+    client.login(auth.token);
+    console.log("Restarted!");
+    return true;
+  }
+}

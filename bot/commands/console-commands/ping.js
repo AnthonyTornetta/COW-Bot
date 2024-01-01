@@ -1,16 +1,13 @@
-const CustomCommand = require('../custom-command');
+import CustomCommand from "../custom-command.js";
 
-module.exports = class Ping extends CustomCommand
-{
-    constructor()
-    {
-        super('ping', 'Says Pong.');
-    }
+export default class Ping extends CustomCommand {
+  constructor() {
+    super("ping", "Says Pong.");
+  }
 
-    action()
-    {
-        console.log('Pong');
+  action() {
+    console.log("Pong");
 
-        return true;
-    }
-};
+    return true;
+  }
+}

@@ -2,21 +2,21 @@ import CustomCommand from "../custom-command.js";
 
 export default class Kick extends CustomCommand {
   constructor() {
-    super("kick", "Kicks a specified person.");
+    super("kick", "UNTESTED!!! Kicks a specified person.");
   }
 
   action(client, split) {
     if (split.length > 1) {
       let memberFound = false;
 
-      client.guilds.forEach((g) => {
+      client.guilds.cache.forEach((g) => {
         g.fetchMembers();
 
-        g.members.forEach((m) => {
+        g.members.cache.forEach((m) => {
           console.log(m.user.tag);
           if (m.user.tag === split[1]) {
             memberFound = true;
-            kick(
+            g.kick(
               m,
               split.length > 2 ? split[2] : "blaspheming",
               g.channels.find((c) => c.name === "general")

@@ -1,4 +1,4 @@
-import Discord from "discord.js";
+import { Client, GatewayIntentBits } from "discord.js";
 import winston from "winston";
 import auth from "./auth.json" with { type: "json" };
 
@@ -26,7 +26,30 @@ const readline = rl.createInterface({
   output: process.stdout,
 });
 
-const client = new Discord.Client();
+const client = new Client({
+  intents: [
+    GatewayIntentBits.AutoModerationConfiguration,
+    GatewayIntentBits.AutoModerationExecution,
+    GatewayIntentBits.DirectMessageReactions,
+    GatewayIntentBits.DirectMessageTyping,
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.GuildBans,
+    GatewayIntentBits.GuildEmojisAndStickers,
+    GatewayIntentBits.GuildIntegrations,
+    GatewayIntentBits.GuildInvites,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildMessageTyping,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildModeration,
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.GuildScheduledEvents,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.GuildWebhooks,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.MessageContent,
+  ],
+});
 
 const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
@@ -65,7 +88,7 @@ function handleConsoleCommand(cmd) {
   }
 }
 
-client.on("message", (msg) => {
+client.on("messageCreate", (msg) => {
   if (msg.content.charAt(0) == "?") {
     const msgRaw = msg.content.substring(1);
 
@@ -78,7 +101,7 @@ client.on("message", (msg) => {
   }
 
   if (msg.content.toLocaleLowerCase().includes("gravity")) {
-    msg.guild.fetchMember(msg.author).then((member) => {
+    msg.guild.members.fetch(msg.author).then((member) => {
       DiscordUtils.kick(member, "blasphemy", msg.channel);
     });
   }

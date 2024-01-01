@@ -3,20 +3,77 @@ import DiscordUtils from "../discord-utils.js";
 import ytdl from "ytdl-core";
 import ytProxy from "./youtube-proxy.js";
 
+import {
+  NoSubscriberBehavior,
+  StreamType,
+  createAudioPlayer,
+  createAudioResource,
+  entersState,
+  AudioPlayerStatus,
+  VoiceConnectionStatus,
+  joinVoiceChannel,
+} from "@discordjs/voice";
+
+async function connectToChannel(channel) {
+  const connection = joinVoiceChannel({
+    channelId: channel.id,
+    guildId: channel.guild.id,
+    adapterCreator: channel.guild.voiceAdapterCreator,
+  });
+  try {
+    await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
+    return connection;
+  } catch (error) {
+    connection.destroy();
+    throw error;
+  }
+}
+
 export default class VCPlayer {
   constructor(vc, txtChannel) {
     this.songs = [];
 
     this.vc = vc;
-    this.dispatcher = null;
     this.txtChannel = txtChannel;
     this.playing = null;
     this.autoplay = false;
 
-    this.timeout = null;
+    this.player = createAudioPlayer({
+      behaviors: {
+        noSubscriber: NoSubscriberBehavior.Play,
+        maxMissedFrames: 5,
+      },
+    });
+
+    connectToChannel(this.vc)
+      .then((con) => {
+        this.connection = con;
+        con.subscribe(this.player);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+
+    this.player.on("stateChange", (oldState, newState) => {
+      if (
+        oldState.status === AudioPlayerStatus.Idle &&
+        newState.status === AudioPlayerStatus.Playing
+      ) {
+        console.log("Playing audio output on audio player");
+      } else if (newState.status === AudioPlayerStatus.Idle) {
+        console.log("Playback has stopped. Attempting to restart.");
+
+        console.log(this.player.unpause());
+
+        // if (this.playing) {
+        // this.playNext();
+        // }
+      }
+    });
   }
 
   playNext() {
+    console.log(this.songs);
     if (this.songs.length === 0) {
       if (this.shouldAutoplay()) {
         this.playAutoplay();
@@ -27,29 +84,17 @@ export default class VCPlayer {
       }
     }
 
-    let song = this.songs[0];
-    for (let i = 1; i < this.songs.length; i++) {
-      this.songs[i - 1] = this.songs[i];
-    }
-    this.songs.length--;
+    const song = this.songs.splice(0, 1)[0];
 
-    this.vc
-      .join()
-      .then((con) => {
-        DiscordUtils.send(`:arrow_forward: ${song.format()}`, this.txtChannel);
+    this.playing = song;
+    const resource = createAudioResource(ytdl(song.url));
 
-        this.playing = song;
-        this.dispatcher = con.playStream(ytdl(song.url));
+    this.player.play(resource);
 
-        this.timeout = setTimeout(() => {
-          this.playNext();
+    console.log(resource);
 
-          this.playing = null;
-        }, song.duration * 1000);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+    DiscordUtils.send(`:arrow_forward: ${song.format()}`, this.txtChannel);
+    // con.playStream();
   }
 
   start() {
@@ -83,11 +128,6 @@ export default class VCPlayer {
   }
 
   skip() {
-    if (this.timeout !== null) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
-
     if (this.songs.length == 0) {
       if (this.shouldAutoplay()) {
         this.playAutoplay();
@@ -103,14 +143,11 @@ export default class VCPlayer {
   }
 
   stop() {
-    if (this.timeout !== null) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
+    if (this.connection !== null) {
+      this.connection.destroy();
     }
 
     this.playing = null;
-    this.dispatcher = null;
-    this.vc.leave();
     this.songs = [];
   }
 

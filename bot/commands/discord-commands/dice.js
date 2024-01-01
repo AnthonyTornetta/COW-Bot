@@ -25,7 +25,7 @@ export default class Dice extends CustomCommand {
         }
       }
 
-      if (numsStr) DiscordUtils.send("🎲:" + numsStr, msg.channel);
+      if (numsStr) DiscordUtils.send("🎲 " + numsStr, msg.channel);
       else DiscordUtils.send("Format: roll #>=1", msg.channel);
     } else DiscordUtils.send("Format: roll #>=1", msg.channel);
   }

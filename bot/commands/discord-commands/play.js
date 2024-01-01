@@ -21,7 +21,8 @@ export default class Play extends CustomCommand {
   }
 
   action(msg) {
-    if (!msg.member.voiceChannelID) {
+    const vc = msg.member.voice.channel;
+    if (!vc) {
       DiscordUtils.send(
         "Must be in a voice channel to use this command!  If you are in a voice channel, try rejoining.",
         msg.channel
@@ -29,7 +30,7 @@ export default class Play extends CustomCommand {
       return;
     }
 
-    let vc = msg.guild.channels.get(msg.member.voiceChannelID);
+    // let vc = msg.guild.channels.get(msg.member.voiceChannelID);
 
     let split = msg.content.split(" ");
     if (split.length === 1) {

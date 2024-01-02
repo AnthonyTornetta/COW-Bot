@@ -1,6 +1,6 @@
 import Song from "./song.js";
 import DiscordUtils from "../discord-utils.js";
-import ytdl from "ytdl-core";
+import play from "play-dl"; // Individual functions
 import ytProxy from "./youtube-proxy.js";
 
 import {
@@ -40,7 +40,7 @@ export default class VCPlayer {
 
     this.player = createAudioPlayer({
       behaviors: {
-        noSubscriber: NoSubscriberBehavior.Pause,
+        noSubscriber: NoSubscriberBehavior.Play,
         maxMissedFrames: 5,
       },
     });
@@ -77,11 +77,14 @@ export default class VCPlayer {
     const song = this.songs.splice(0, 1)[0];
 
     this.playing = song;
-    const resource = createAudioResource(
-      ytdl(song.url, {
-        filter: "audioonly",
-      })
-    );
+
+    const stream = await play.stream(song.url, {
+      discordPlayerCompatibility: true,
+    });
+
+    const resource = createAudioResource(stream.stream, {
+      inputType: stream.type,
+    });
 
     this.player.play(resource);
     this.resource = resource;
